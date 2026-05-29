@@ -1,74 +1,59 @@
-# Pluggable Bot Demo — BluePipe Plumbing
+# Pluggable Bot Demo
 
-This small static demo shows how a single website can host multiple chatbot integrations and switch between them via a visual toggle or a URL query parameter.
+A static demo showing how a single page can host multiple chatbot integrations and switch between them per business context using a tab bar or URL parameter.
 
-Getting started
+## Getting started
 
-1. Open `index.html` in a static server (recommended) or directly in the browser.
-   - Quick: run a simple HTTP server from the project folder, for example using Python:
+Serve the project with any static file server:
 
 ```
-python -m http.server 8000
+npx serve .
 ```
 
-Then open http://localhost:8000 in your browser.
+Then open `http://localhost:3000` in your browser.
 
-How to switch bots
+## How to switch businesses
 
-- Use the dropdown and click **Open Chat** to load a demo integration.
-- Or use a URL parameter: `?bot=landbot` or `?bot=localbot` or `?bot=tars`.
+- Click a tab (BluePipe Plumbing, Sparky's Electrical, Nailed It Roofing) to switch context.
+- Or use the URL parameter: `?biz=bluepipe`, `?biz=sparky`, or `?biz=roofing`.
+- Click **Open Chat** to load that business's bot. Click it again to close.
 
-What this demo includes
+## Project structure
 
-- `index.html` — main page with controls.
-- `css/style.css` — simple styles and chat widget styling.
-- `js/main.js` — loader that dynamically injects integration adapters and manages `?bot=` query param.
-- `js/integrations/*.js` — three simulated integration adapters:
-  - `localbot.js` — simulated AI assistant (canned replies)
+- `index.html` — page shell with tab bar and chat mount point.
+- `css/style.css` — layout and chat widget styles.
+- `js/main.js` — tab switching, URL sync, and lazy integration loader.
+- `js/integrations/` — one adapter file per bot:
+  - `plumbingbot.js` — BluePipe Plumbing (Claude via Cloudflare Worker proxy)
+  - `sparkysbot.js` — Sparky's Electrical (Claude via Cloudflare Worker proxy)
+  - `roofingbot.js` — Nailed It Roofing (Claude via Cloudflare Worker proxy)
+  - `llamabot.js` — local Gemma/Ollama integration
+  - `localbot.js` — simulated assistant (canned replies, no network)
   - `tars.js` — simulated conversational form flow
   - `landbot.js` — simulated quick-response widget
 
-How to add a real third-party integration
+## How adapters work
 
-There are two safe patterns:
+Each adapter file calls `window.PluggableBot.register({ name, init })`. The loader in `main.js` lazy-loads the adapter script on demand and calls `init({ container })` to mount the widget.
 
-1. Replace a simulated adapter with the provider's embed code
-
-   - Open `js/integrations/localbot.js` (or create `yourprovider.js`).
-   - Instead of the simulated `init` implementation, inject the vendor's script snippet and call the vendor's widget open API inside `init({container})`.
-
-   Example skeleton:
+Skeleton for a new adapter:
 
 ```js
 window.PluggableBot.register({
   name: 'yourprovider',
-  init({container}){
-    // insert vendor script tag or widget snippet
-    const s = document.createElement('script');
-    s.src = 'https://vendor.example.com/widget.js';
-    document.body.appendChild(s);
-    // some vendors expose init after load; follow provider docs
+  init({ container }) {
+    // build or inject your widget into container
   }
 });
 ```
 
-2. Use the loader approach and call the provider's initialize API
+## Cloudflare proxy adapters
 
-   - The loader (`js/main.js`) will load `js/integrations/yourprovider.js` and `yourprovider.js` should register itself with `window.PluggableBot.register({name, init})`.
+`plumbingbot.js`, `sparkysbot.js`, and `roofingbot.js` all POST to a Cloudflare Worker at `https://api.blackdiamondconsulting.ai/chat` with a `site_id` and message history. Each site ID is registered in the Cloudflare Worker's KV store and maps to an encrypted Anthropic API key and system prompt.
 
-Free/trial providers to consider (start here):
+To update a `site_id`, edit the `SITE_ID` constant at line 5 of the relevant integration file.
 
-- Landbot — offers trial and embeddable widgets.
-- Calendly — scheduling widget (free tier) for appointment booking.
-- Tidio, Crisp, Tars — have free or trial plans and embeddable scripts.
+## Notes
 
-Notes and caveats
-
-- Some vendors require account-specific IDs or tokens in their script snippet. Keep keys out of public repos; use environment variables or server-side injection for production demos.
-- Some external sites block embedding via iframe (X-Frame-Options). Use vendor-provided embed scripts or open in a modal/popover per provider docs.
-
-Next steps I can do for you
-
-- Add a real provider integration (I can add the embed snippet if you provide the vendor widget code or keys).
-- Add analytics to track which adapter was demoed and user interactions.
-- Deploy this demo to GitHub Pages or a public URL.
+- Keep API keys out of public repos. The Cloudflare proxy handles key storage server-side.
+- Some vendors block iframe embedding (X-Frame-Options). Use vendor embed scripts or a modal per provider docs.

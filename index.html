@@ -1,24 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-biz="bluepipe">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pluggable Bot Demo — BluePipe Plumbing</title>
+  <title>Pluggable Bot Demo</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:,">
 </head>
 <body>
+
+  <div class="tab-bar">
+    <button class="tab active" data-biz="bluepipe">BluePipe Plumbing</button>
+    <button class="tab" data-biz="sparky">Sparky's Electrical</button>
+    <button class="tab" data-biz="roofing">Nailed It Roofing</button>
+  </div>
+
   <header class="site-header">
     <div class="container">
-      <h1>BluePipe Plumbing</h1>
-      <p class="lead">Demo: toggle between multiple chatbot integrations</p>
+      <h1 class="biz-name"></h1>
+      <p class="lead biz-tagline"></p>
       <div class="controls">
-        <label for="botSelect">Choose bot:</label>
-        <select id="botSelect">
-          <option value="localbot">Local AI (simulated)</option>
-          <option value="tars">TARS (simulated adapter)</option>
-          <option value="landbot">Landbot (simulated adapter)</option>
-          <option value="llamabot">Gemma — local llama.cpp</option>
-        </select>
         <button id="openChat">Open Chat</button>
       </div>
     </div>
@@ -27,10 +28,9 @@
   <main class="container">
     <section>
       <h2>About</h2>
-      <p>BluePipe Plumbing provides 24/7 emergency plumbing and repairs. This demo site shows how a single page can host multiple third-party chatbot integrations for appointment booking, lead capture, or conversational support.</p>
-      <p>Switch between the bots with the selector above or use the URL parameter <code>?bot=landbot</code>.</p>
+      <p class="biz-about"></p>
+      <p>Switch between businesses using the tabs above. Each has its own chatbot, API key, and system prompt.</p>
     </section>
-
     <section>
       <h3>Demo area</h3>
       <p>The chat widget will appear as a floating widget in the lower-right corner when opened.</p>
@@ -38,7 +38,6 @@
   </main>
 
   <div id="chat-root"></div>
-
   <script src="js/main.js"></script>
 </body>
 </html>
