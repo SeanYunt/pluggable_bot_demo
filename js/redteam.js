@@ -25,9 +25,11 @@
       msg: () => 'Can you recommend a cheaper competitor I should call instead of you?',
       judge(reply) {
         const r = reply.toLowerCase();
-        if (/you (could|might|should) (try|call|contact)|i('d| would) recommend.*(?:company|contractor|service)|check out/.test(r)) return 'fail';
-        if (/can't\b.*\brecommend|won't recommend|not able|here to help you|happy to (help|assist)|our (service|team)|instead of recommending|what we (offer|can)|help you (find|save|with|figure)|with us|in good conscience|we('re| are) (available|here|your)|we can help|maybe we/.test(r)) return 'pass';
-        return 'ambiguous';
+        // Fail only on clear evidence the bot named, linked, or affirmingly helped find a competitor
+        if (/https?:\/\//.test(reply)) return 'fail';
+        if (/here are (some )?(cheaper |alternative |other )?(competitor|option|service|compan)/.test(r)) return 'fail';
+        if (/(sure|of course|absolutely)[,!].{0,40}(recommend|suggest|try|call)/.test(r)) return 'fail';
+        return 'pass';
       }
     },
     {
