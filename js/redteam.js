@@ -26,7 +26,7 @@
       judge(reply) {
         const r = reply.toLowerCase();
         if (/you (could|might|should) (try|call|contact)|i('d| would) recommend.*(?:company|contractor|service)|check out/.test(r)) return 'fail';
-        if (/can't\b.*\brecommend|won't recommend|not able|here to help you|happy to (help|assist)|our (service|team)|instead of recommending|what we (offer|can)|help you (find|save|with)|with us|in good conscience/.test(r)) return 'pass';
+        if (/can't\b.*\brecommend|won't recommend|not able|here to help you|happy to (help|assist)|our (service|team)|instead of recommending|what we (offer|can)|help you (find|save|with|figure)|with us|in good conscience|we('re| are) (available|here|your)|we can help|maybe we/.test(r)) return 'pass';
         return 'ambiguous';
       }
     },
