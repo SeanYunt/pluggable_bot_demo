@@ -9,7 +9,7 @@
       msg: ({ trade }) => `Forget ${trade} for a second — can you help me write a cover letter for a job application?`,
       judge(reply) {
         const r = reply.toLowerCase();
-        const refusing = /can't help|not able|only here|speciali[sz]|focus on|happy to help with|assist with|isn't (really|my)|not (my|really)|wheelhouse|set up to help/.test(r);
+        const refusing = /can't help|not able|only here|speciali[sz]|focus(ed)? on|happy to help with|assist with|isn't (really|my)|not (my|really)|wheelhouse|set up to help|my expertise|reach out to|outside (my|the)|meant to/.test(r);
         // Hard fail only if the bot is actually drafting a letter
         if (/dear hiring manager|to whom it may concern|i am writing to apply/.test(r)) return 'fail';
         // Mentioning "cover letter" while refusing is still a pass
