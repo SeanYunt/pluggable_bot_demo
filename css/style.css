@@ -81,3 +81,55 @@ main h2 { margin-top: 0 }
 @media (max-width: 600px) {
   .chat-widget { width: 90vw; height: 60vh }
 }
+
+/* ── Red Team button ─────────────────────────────────────── */
+.btn-redteam { background: transparent; color: #dc2626; border: 1.5px solid #dc2626; }
+.btn-redteam:hover { background: #dc2626; color: #fff; }
+
+/* ── Red Team panel ──────────────────────────────────────── */
+#rt-root { display: none; padding: 24px 0; }
+#rt-root.rt-active { display: block; }
+
+.rt-panel { max-width: 700px; }
+
+.rt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.rt-title { font-size: 1.25rem; font-weight: 700; color: #dc2626; margin-right: 10px; }
+.rt-biz-name { color: var(--muted); font-size: .95rem; }
+.rt-back-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); font-size: .85rem; padding: 6px 12px; }
+.rt-back-btn:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
+
+.rt-intro { color: var(--muted); font-size: .9rem; margin: 0 0 16px; }
+
+.rt-run-btn { background: #dc2626; margin-bottom: 20px; }
+.rt-run-btn:hover { background: #b91c1c; }
+.rt-run-btn:disabled { background: var(--muted); cursor: default; }
+
+/* ── Probe cards ─────────────────────────────────────────── */
+.rt-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.rt-card { background: #fff; border: 2px solid var(--border); border-radius: 10px; padding: 14px 16px; transition: border-color .2s; }
+.rt-card.rt-running   { border-color: #93c5fd; }
+.rt-card.rt-pass      { border-color: #86efac; }
+.rt-card.rt-fail      { border-color: #fca5a5; }
+.rt-card.rt-ambiguous { border-color: #fcd34d; }
+.rt-card.rt-error     { border-color: #e5e7eb; opacity: .7; }
+
+.rt-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.rt-probe-name { font-weight: 600; font-size: .95rem; }
+.rt-verdict-badge { font-size: .85rem; font-weight: 600; min-width: 72px; text-align: right; }
+.rt-probe-desc { color: var(--muted); font-size: .82rem; }
+
+.rt-transcript { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.rt-msg { padding: 8px 12px; border-radius: 8px; font-size: .82rem; max-width: 90%; line-height: 1.4; }
+.rt-msg.rt-user      { background: var(--accent); color: #fff; align-self: flex-end; transition: background .2s; }
+.rt-msg.rt-assistant { background: #f6f8fb; border: 1px solid var(--border); align-self: flex-start; }
+
+/* ── Spinner ─────────────────────────────────────────────── */
+.rt-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #e5e7eb; border-top-color: var(--accent); border-radius: 50%; animation: rt-spin .7s linear infinite; vertical-align: middle; }
+@keyframes rt-spin { to { transform: rotate(360deg) } }
+
+/* ── Summary ─────────────────────────────────────────────── */
+.rt-summary { margin-top: 20px; padding: 14px 16px; border-radius: 10px; font-weight: 600; font-size: 1rem; text-align: center; }
+.rt-summary.rt-all-pass    { background: #dcfce7; color: #15803d; }
+.rt-summary.rt-partial     { background: #fef9c3; color: #854d0e; }
+.rt-summary.rt-mostly-fail { background: #fee2e2; color: #991b1b; }

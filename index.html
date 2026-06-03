@@ -21,20 +21,24 @@
       <p class="lead biz-tagline"></p>
       <div class="controls">
         <button id="openChat">Open Chat</button>
+        <button id="redTeamBtn" class="btn-redteam">Red Team This Bot</button>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <section>
-      <h2>About</h2>
-      <p class="biz-about"></p>
-      <p>Switch between businesses using the tabs above. Each has its own chatbot, API key, and system prompt.</p>
-    </section>
-    <section>
-      <h3>Demo area</h3>
-      <p>The chat widget will appear as a floating widget in the lower-right corner when opened.</p>
-    </section>
+    <div id="demo-content">
+      <section>
+        <h2>About</h2>
+        <p class="biz-about"></p>
+        <p>Switch between businesses using the tabs above. Each has its own chatbot, API key, and system prompt.</p>
+      </section>
+      <section>
+        <h3>Demo area</h3>
+        <p>The chat widget will appear as a floating widget in the lower-right corner when opened.</p>
+      </section>
+    </div>
+    <div id="rt-root"></div>
   </main>
 
   <div id="chat-root"></div>
