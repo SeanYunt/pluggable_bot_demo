@@ -202,7 +202,7 @@
           transcriptEl.textContent = e.message;
         }
 
-        await delay(300);
+        await delay(2000);
       }
 
       runBtn.style.display = 'none';
