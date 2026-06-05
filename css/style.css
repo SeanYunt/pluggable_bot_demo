@@ -21,6 +21,13 @@ html[data-biz="roofing"] {
   --border: #bbf7d0;
 }
 
+html[data-biz="serviceco"] {
+  --accent: #35063e;
+  --accent-dark: #240429;
+  --bg: #fdf4ff;
+  --border: #ddb8e8;
+}
+
 /* ── Base ──────────────────────────────────────────────────── */
 * { box-sizing: border-box }
 body { font-family: Inter, Segoe UI, Arial, sans-serif; margin: 0; background: var(--bg); color: #111; transition: background .2s; }
@@ -129,6 +136,44 @@ main h2 { margin-top: 0 }
 /* ── Spinner ─────────────────────────────────────────────── */
 .rt-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #e5e7eb; border-top-color: var(--accent); border-radius: 50%; animation: rt-spin .7s linear infinite; vertical-align: middle; }
 @keyframes rt-spin { to { transform: rotate(360deg) } }
+
+/* ── Service Co sandbox ─────────────────────────────────── */
+#sc-root { display: none; }
+
+.sc-panel { max-width: 700px; }
+
+.sc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; }
+.sc-title { font-size: 1.1rem; font-weight: 700; color: var(--accent); margin: 0 0 4px; }
+.sc-subtitle { color: var(--muted); font-size: .85rem; margin: 0; }
+
+.sc-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; padding: 10px 14px; background: #fff; border: 1px solid var(--border); border-radius: 8px; }
+.sc-controls-label { font-size: .75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.sc-preset-group { display: flex; gap: 4px; }
+.sc-preset-btn { background: transparent; color: var(--muted); border: 1.5px solid var(--border); font-size: .83rem; padding: 4px 14px; border-radius: 20px; cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
+.sc-preset-btn:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
+.sc-preset-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.sc-preset-btn.active:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.sc-model-select { border: 1.5px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: .83rem; color: #111; background: #fff; cursor: pointer; margin-left: auto; }
+.sc-model-select:focus { outline: none; border-color: var(--accent); }
+
+.sc-prompt-preview { margin-bottom: 14px; }
+.sc-prompt-toggle { background: transparent; border: none; color: var(--muted); font-size: .8rem; padding: 0; cursor: pointer; text-decoration: underline; }
+.sc-prompt-toggle:hover { color: var(--accent); background: transparent; }
+.sc-prompt-body { display: none; margin-top: 8px; padding: 10px 14px; background: #fff; border: 1px solid var(--border); border-radius: 8px; font-size: .8rem; color: #374151; font-family: Consolas, monospace; line-height: 1.55; white-space: pre-wrap; }
+.sc-prompt-body.visible { display: block; }
+
+.sc-chat { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+.sc-chat-header { background: var(--accent); color: #fff; padding: 11px 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; gap: 8px; transition: background .2s; }
+.sc-chat-meta { font-size: .72rem; font-weight: 400; opacity: .8; display: flex; gap: 8px; align-items: center; }
+.sc-chat-reset { color: #fff; opacity: .8; text-decoration: underline; cursor: pointer; font-size: .78rem; background: transparent; border: none; padding: 0; font-weight: 400; }
+.sc-chat-reset:hover { opacity: 1; background: transparent; }
+.sc-chat-body { flex: 1; padding: 12px; overflow-y: auto; background: #f6f8fb; min-height: 260px; max-height: 360px; }
+.sc-chat-input { display: flex; padding: 10px; border-top: 1px solid #eee; gap: 8px; }
+.sc-chat-input input { flex: 1; padding: 7px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: .9rem; }
+.sc-chat-input input:focus { outline: none; border-color: var(--accent); }
+.sc-chat-input button { background: var(--accent); color: #fff; border: none; padding: 7px 18px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: background .15s; }
+.sc-chat-input button:hover { background: var(--accent-dark); }
+.sc-chat-input button:disabled { background: var(--muted); cursor: default; }
 
 /* ── Summary ─────────────────────────────────────────────── */
 .rt-summary { margin-top: 20px; padding: 14px 16px; border-radius: 10px; font-weight: 600; font-size: 1rem; text-align: center; }

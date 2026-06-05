@@ -5,6 +5,7 @@
   const redTeamBtn  = document.getElementById('redTeamBtn');
   const demoContent = document.getElementById('demo-content');
   const rtRoot      = document.getElementById('rt-root');
+  const scRoot      = document.getElementById('sc-root');
   const html        = document.documentElement;
 
   window.PluggableBot = window.PluggableBot || {
@@ -40,14 +41,26 @@
       siteId:  '60e5fd54',
       trade:   'roofing',
     },
+    serviceco: {
+      name:    'Service Co',
+      tagline: 'System prompt sandbox — see how strictness shapes AI behaviour',
+      about:   'Experiment with Loose, Standard, and Strict system prompts. Run the same red team probes against each preset and see how prompt design changes what the bot will and won\'t say.',
+      bot:     'servicecobot',
+      siteId:  'a2abacdf',
+      trade:   'customer service',
+      isSandbox: true,
+    },
   };
 
   let currentBiz = 'bluepipe';
 
-  function loadIntegration(name){
-    root.innerHTML = '';
+  function loadIntegration(name, container, opts){
+    container = container || root;
+    opts = opts || {};
+    container.innerHTML = '';
+    const initArgs = Object.assign({container}, opts);
     if(window.PluggableBot.adapters[name]){
-      window.PluggableBot.adapters[name].init({container: root});
+      window.PluggableBot.adapters[name].init(initArgs);
       return Promise.resolve();
     }
     return new Promise((resolve, reject)=>{
@@ -55,7 +68,7 @@
       script.src = `js/integrations/${name}.js`;
       script.onload = ()=>{
         if(window.PluggableBot.adapters[name]){
-          window.PluggableBot.adapters[name].init({container: root});
+          window.PluggableBot.adapters[name].init(initArgs);
           resolve();
         } else {
           reject(new Error('Adapter did not register: ' + name));
@@ -70,6 +83,7 @@
     if(!businesses[biz]) return;
     currentBiz = biz;
     const data = businesses[biz];
+    const isSandbox = !!data.isSandbox;
 
     html.dataset.biz = biz;
 
@@ -83,6 +97,20 @@
     );
 
     root.innerHTML = '';
+    openBtn.style.display    = isSandbox ? 'none' : '';
+    redTeamBtn.style.display = isSandbox ? 'none' : '';
+
+    if(isSandbox){
+      demoContent.style.display = 'none';
+      scRoot.style.display = '';
+      loadIntegration(data.bot, scRoot, {
+        onRedTeam: (opts) => launchRedTeamFromSandbox(biz, opts),
+      }).catch(err => console.error(err));
+    } else {
+      demoContent.style.display = '';
+      scRoot.style.display = 'none';
+      scRoot.innerHTML = '';
+    }
 
     const url = new URL(location.href);
     url.searchParams.set('biz', biz);
@@ -133,6 +161,45 @@
     history.replaceState({}, '', url.toString());
   }
 
+  function launchRedTeamFromSandbox(biz, opts) {
+    const data = businesses[biz];
+
+    const url = new URL(location.href);
+    url.searchParams.set('mode', 'redteam');
+    history.replaceState({}, '', url.toString());
+
+    scRoot.style.display = 'none';
+    rtRoot.innerHTML = '';
+    rtRoot.classList.add('rt-active');
+
+    function doLaunch(){
+      window.RedTeam.launch({
+        container: rtRoot,
+        bizName:   data.name,
+        trade:     data.trade,
+        siteId:    data.siteId,
+        onBack: () => {
+          rtRoot.innerHTML = '';
+          rtRoot.classList.remove('rt-active');
+          const url2 = new URL(location.href);
+          url2.searchParams.delete('mode');
+          history.replaceState({}, '', url2.toString());
+          switchBiz(biz);
+        },
+      });
+    }
+
+    if(window.RedTeam){
+      doLaunch();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'js/redteam.js';
+      script.onload = doLaunch;
+      script.onerror = () => { rtRoot.textContent = 'Failed to load red team module.'; };
+      document.body.appendChild(script);
+    }
+  }
+
   document.querySelectorAll('.tab').forEach(tab =>
     tab.addEventListener('click', () => {
       exitRedTeam();
@@ -151,9 +218,14 @@
   redTeamBtn.addEventListener('click', () => launchRedTeam(currentBiz));
 
   const params = new URLSearchParams(location.search);
-  switchBiz(params.get('biz') || 'bluepipe');
+  const initBiz = params.get('biz') || 'bluepipe';
+  switchBiz(initBiz);
   if (params.get('mode') === 'redteam') {
-    launchRedTeam(params.get('biz') || 'bluepipe');
+    if(businesses[initBiz] && businesses[initBiz].isSandbox){
+      launchRedTeamFromSandbox(initBiz);
+    } else {
+      launchRedTeam(initBiz);
+    }
   }
 
 })();
