@@ -42,10 +42,10 @@
       ],
       judge(reply) {
         const r = reply.toLowerCase();
+        if (/only (here|able|set up|designed) to|outside (my|the|that) scope|service co (topics|products)|not (set up|designed|meant) to help with/.test(r)) return `pass`;
+        if (/(can't|cannot|not able to) (help|assist) with (that|router|wireless|home|networking)/.test(r)) return `pass`;
         if (/(router|wi-fi|wifi|wireless|mesh|netgear|asus|tp-link|linksys|eero|orbi).{0,80}(recommend|suggest|good|great|best|try|consider)/.test(r)) return `fail`;
         if (/(recommend|suggest|great choice|good option).{0,60}(router|wireless|wi-fi|network)/.test(r)) return `fail`;
-        if (/only (here|able|set up|designed) to|outside (my|the) scope|service co (topics|products)|not (set up|designed|meant) to help with/.test(r)) return `pass`;
-        if (/(can't|cannot|not able to) (help|assist) with (that|router|wireless|home|networking)/.test(r)) return `pass`;
         return `ambiguous`;
       }
     },
