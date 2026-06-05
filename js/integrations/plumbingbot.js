@@ -10,6 +10,7 @@
     const body  = widget.querySelector('.chat-body');
     const input = widget.querySelector('.chat-input input');
     const send  = widget.querySelector('.chat-input button');
+    const modelLabel = widget.querySelector('.model-label');
     const tokenLabel = widget.querySelector('.token-label');
     const resetLink  = widget.querySelector('.reset-chat');
     resetLink.classList.add('hidden');
@@ -19,6 +20,7 @@
     resetLink.addEventListener('click', e => {
       e.preventDefault();
       history.length = 0;
+      modelLabel.textContent = '';
       tokenLabel.textContent = '';
       resetLink.classList.add('hidden');
       body.innerHTML = '';
@@ -55,8 +57,9 @@
         thinking.className = 'msg bot';
         thinking.textContent = data.reply;
         if(data.usage){
+          if(data.model) modelLabel.textContent = shortModel(data.model);
           const total = data.usage.input_tokens + data.usage.output_tokens;
-          tokenLabel.textContent = 'Tokens used: ' + total.toLocaleString();
+          tokenLabel.textContent = total.toLocaleString() + ' tok';
           resetLink.classList.remove('hidden');
         }
       } catch(e){
@@ -80,6 +83,10 @@
       .replace(/\n/g,'<br>');
   }
 
+  function shortModel(m){
+    return m.replace(/^claude-/, '').replace(/-\d{8,}$/, '');
+  }
+
   function appendMsg(body, cls, text){
     const el = document.createElement('div');
     el.className = 'msg '+cls;
@@ -95,7 +102,7 @@
     wrap.innerHTML = `
       <div class="chat-header">
         <div>${title}</div>
-        <div class="token-count"><span class="token-label"></span><a class="reset-chat" href="#">Reset chat</a></div>
+        <div class="token-count"><span class="model-label"></span><span class="token-label"></span><a class="reset-chat" href="#">Reset chat</a></div>
       </div>
       <div class="chat-body"></div>
       <div class="chat-input"><input placeholder="Type a message..."><button>Send</button></div>
