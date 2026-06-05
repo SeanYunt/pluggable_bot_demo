@@ -59,7 +59,7 @@
         if(data.usage){
           if(data.model) modelLabel.textContent = shortModel(data.model);
           const total = data.usage.input_tokens + data.usage.output_tokens;
-          tokenLabel.textContent = total.toLocaleString() + ' tok';
+          tokenLabel.textContent = total.toLocaleString() + ' tokens';
           resetLink.classList.remove('hidden');
         }
       } catch(e){
