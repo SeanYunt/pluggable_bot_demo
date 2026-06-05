@@ -43,7 +43,7 @@
     },
     serviceco: {
       name:    'Service Co',
-      tagline: 'System prompt sandbox — see how strictness shapes AI behaviour',
+      tagline: 'System prompt sandbox — see how strictness shapes AI behavior',
       about:   'Experiment with Loose, Standard, and Strict system prompts. Run the same red team probes against each preset and see how prompt design changes what the bot will and won\'t say.',
       bot:     'servicecobot',
       siteId:  'a2abacdf',
@@ -102,7 +102,7 @@
 
     if(isSandbox){
       demoContent.style.display = 'none';
-      scRoot.style.display = '';
+      scRoot.style.display = 'block';
       loadIntegration(data.bot, scRoot, {
         onRedTeam: (opts) => launchRedTeamFromSandbox(biz, opts),
       }).catch(err => console.error(err));

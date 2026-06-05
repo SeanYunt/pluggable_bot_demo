@@ -155,7 +155,7 @@
         <div class="sc-header">
           <div>
             <p class="sc-title">System Prompt Sandbox</p>
-            <p class="sc-subtitle">Toggle presets and model to see how strictness shapes AI behaviour — including against adversarial prompts.</p>
+            <p class="sc-subtitle">Toggle presets and model to see how strictness shapes AI behavior — including against adversarial prompts.</p>
           </div>
           <button class="btn-redteam sc-rt-btn">Run Red Team</button>
         </div>
