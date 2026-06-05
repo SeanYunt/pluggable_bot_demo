@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const API_URL = 'https://api.blackdiamondconsulting.ai/chat';
 
   const PROBES = [
@@ -85,11 +85,11 @@
     }
   ];
 
-  async function callApi(siteId, messages) {
+  async function callApi(siteId, messages, preset, model) {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ site_id: siteId, messages })
+      body: JSON.stringify({ site_id: siteId, messages, preset, model })
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
@@ -97,7 +97,7 @@
     return data.reply;
   }
 
-  async function runProbe(probe, siteId, ctx) {
+  async function runProbe(probe, siteId, ctx, preset, model) {
     const history = [];
     const transcript = [];
 
@@ -106,7 +106,7 @@
         const content = turnFn(ctx);
         history.push({ role: 'user', content });
         transcript.push({ role: 'user', content });
-        const reply = await callApi(siteId, history.slice());
+        const reply = await callApi(siteId, history.slice(), preset, model);
         history.push({ role: 'assistant', content: reply });
         transcript.push({ role: 'assistant', content: reply });
       }
@@ -115,15 +115,22 @@
 
     const content = probe.msg(ctx);
     transcript.push({ role: 'user', content });
-    const reply = await callApi(siteId, [{ role: 'user', content }]);
+    const reply = await callApi(siteId, [{ role: 'user', content }], preset, model);
     transcript.push({ role: 'assistant', content: reply });
     return { transcript, reply };
   }
 
   function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  function launch({ container, bizName, trade, siteId, onBack }) {
+  function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ``; }
+
+  function launch({ container, bizName, trade, siteId, preset, model, onBack }) {
     const ctx = { trade, bizName };
+
+    let sandboxMeta = '';
+    if (preset) {
+      sandboxMeta = '<p class="rt-sandbox-meta">Preset: <strong>' + capitalize(preset) + '</strong> &mdash; Model: <strong>' + capitalize(model || 'haiku') + '</strong></p>';
+    }
 
     const panel = document.createElement('div');
     panel.className = 'rt-panel';
@@ -135,7 +142,8 @@
         </div>
         <button class="rt-back-btn">← Back to Demo</button>
       </div>
-      <p class="rt-intro">Running ${PROBES.length} adversarial probes against this bot’s defenses.</p>
+      ${sandboxMeta}
+      <p class="rt-intro">Running ${PROBES.length} adversarial probes against this bot's defenses.</p>
       <button class="rt-run-btn">&#9654; Run All Probes</button>
       <div class="rt-cards"></div>
       <div class="rt-summary" style="display:none"></div>
@@ -179,7 +187,7 @@
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         try {
-          const { transcript, reply } = await runProbe(probe, siteId, ctx);
+          const { transcript, reply } = await runProbe(probe, siteId, ctx, preset, model);
           const verdict = probe.judge(reply);
           if (verdict === 'pass') passed++;
 

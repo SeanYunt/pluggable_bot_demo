@@ -178,6 +178,8 @@
         bizName:   data.name,
         trade:     data.trade,
         siteId:    data.siteId,
+        preset:    opts && opts.preset,
+        model:     opts && opts.model,
         onBack: () => {
           rtRoot.innerHTML = '';
           rtRoot.classList.remove('rt-active');

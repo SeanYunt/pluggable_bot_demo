@@ -107,6 +107,9 @@ main h2 { margin-top: 0 }
 .rt-back-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); font-size: .85rem; padding: 6px 12px; }
 .rt-back-btn:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
 
+.rt-sandbox-meta { font-size: .82rem; color: var(--muted); margin: 0 0 12px; padding: 6px 10px; background: #fff; border: 1px solid var(--border); border-radius: 6px; display: inline-block; }
+.rt-sandbox-meta strong { color: #111; }
+
 .rt-intro { color: var(--muted); font-size: .9rem; margin: 0 0 16px; }
 
 .rt-run-btn { background: #dc2626; margin-bottom: 20px; }

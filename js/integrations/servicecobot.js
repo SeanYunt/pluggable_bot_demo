@@ -95,7 +95,7 @@
     });
 
     rtBtn.addEventListener('click', () => {
-      if(typeof onRedTeam === 'function') onRedTeam({ preset: currentPreset });
+      if(typeof onRedTeam === 'function') onRedTeam({ preset: currentPreset, model: currentModel });
     });
 
     async function handleSend(){
