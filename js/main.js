@@ -52,7 +52,7 @@
     },
   };
 
-  let currentBiz = 'bluepipe';
+  let currentBiz = 'serviceco';
 
   function loadIntegration(name, container, opts){
     container = container || root;
@@ -220,7 +220,7 @@
   redTeamBtn.addEventListener('click', () => launchRedTeam(currentBiz));
 
   const params = new URLSearchParams(location.search);
-  const initBiz = params.get('biz') || 'bluepipe';
+  const initBiz = params.get('biz') || 'serviceco';
   switchBiz(initBiz);
   if (params.get('mode') === 'redteam') {
     if(businesses[initBiz] && businesses[initBiz].isSandbox){
