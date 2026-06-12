@@ -16,10 +16,12 @@
     resetLink.classList.add('hidden');
 
     const history = [];
+    const firedIntents = new Set();
 
     resetLink.addEventListener('click', e => {
       e.preventDefault();
       history.length = 0;
+      firedIntents.clear();
       modelLabel.textContent = '';
       tokenLabel.textContent = '';
       resetLink.classList.add('hidden');
@@ -33,6 +35,7 @@
     async function handleSend(){
       const text = input.value.trim();
       if(!text) return;
+      if(window.BotIntent) window.BotIntent.track('Nailed It Roofing', text, firedIntents);
       appendMsg(body, 'user', text);
       input.value = '';
       send.disabled = true;
