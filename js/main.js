@@ -1,4 +1,6 @@
 // Pluggable bot loader with tab-based business switching
+// Bump this on every deploy to bust CDN/browser cache for dynamic scripts
+const DEPLOY_V = '20260612a';
 (function(){
   const root        = document.getElementById('chat-root');
   const openBtn     = document.getElementById('openChat');
@@ -65,7 +67,7 @@
     }
     return new Promise((resolve, reject)=>{
       const script = document.createElement('script');
-      script.src = `js/integrations/${name}.js`;
+      script.src = `js/integrations/${name}.js?v=${DEPLOY_V}`;
       script.onload = ()=>{
         if(window.PluggableBot.adapters[name]){
           window.PluggableBot.adapters[name].init(initArgs);
@@ -144,7 +146,7 @@
       doLaunch();
     } else {
       const script = document.createElement('script');
-      script.src = 'js/redteam.js';
+      script.src = `js/redteam.js?v=${DEPLOY_V}`;
       script.onload = doLaunch;
       script.onerror = () => { rtRoot.textContent = 'Failed to load red team module.'; };
       document.body.appendChild(script);
@@ -195,7 +197,7 @@
       doLaunch();
     } else {
       const script = document.createElement('script');
-      script.src = 'js/redteam.js';
+      script.src = `js/redteam.js?v=${DEPLOY_V}`;
       script.onload = doLaunch;
       script.onerror = () => { rtRoot.textContent = 'Failed to load red team module.'; };
       document.body.appendChild(script);
