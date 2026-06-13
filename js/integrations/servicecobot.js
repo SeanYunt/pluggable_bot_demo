@@ -5,6 +5,11 @@
   const API_URL = 'https://api.blackdiamondconsulting.ai/chat';
   const SITE_ID = 'a2abacdf';
 
+  function track(event, props) {
+    console.log('[Analytics]', event, props);
+    if(typeof plausible === 'function') plausible(event, { props });
+  }
+
   const PRESETS = {
     loose: {
       label: 'Loose',
@@ -67,7 +72,7 @@
         resetChat('Hello! I\'m the Service Co assistant. Pick a preset above, then ask me anything — or hit "Run Red Team" to probe the bot adversarially.');
       } else {
         resetChat('Switched to ' + PRESETS[preset].label + ' preset. Conversation reset.');
-        if(typeof plausible === 'function') plausible('Preset Selected', { props: { preset } });
+        track('Preset Selected', { preset });
       }
     }
 
@@ -82,14 +87,14 @@
       if(m !== currentModel){
         currentModel = m;
         resetChat('Model changed to ' + MODELS.find(x => x.value === m).label + '. Conversation reset.');
-        if(typeof plausible === 'function') plausible('Model Selected', { props: { model: m } });
+        track('Model Selected', { model: m });
       }
     });
 
     promptToggle.addEventListener('click', () => {
       const visible = promptBody.classList.toggle('visible');
       promptToggle.textContent = visible ? '▲ Hide system prompt' : '▼ Show system prompt';
-      if(visible && typeof plausible === 'function') plausible('System Prompt Viewed', { props: { preset: currentPreset } });
+      if(visible) track('System Prompt Viewed', { preset: currentPreset });
     });
 
     resetBtn.addEventListener('click', e => {
@@ -98,7 +103,7 @@
     });
 
     rtBtn.addEventListener('click', () => {
-      if(typeof plausible === 'function') plausible('Red Team Launched', { props: { preset: currentPreset, model: currentModel } });
+      track('Red Team Launched', { preset: currentPreset, model: currentModel });
       if(typeof onRedTeam === 'function') onRedTeam({ preset: currentPreset, model: currentModel });
     });
 
