@@ -180,6 +180,12 @@
     runBtn.addEventListener(`click`, async () => {
       runBtn.disabled = true;
       runBtn.textContent = `Running…`;
+      if(typeof plausible === 'function'){
+        const p = { source: preset ? `sandbox` : `header` };
+        if(preset) p.preset = preset;
+        if(model) p.model = model;
+        plausible(`Red Team Run Started`, { props: p });
+      }
       let passed = 0;
 
       for (const probe of PROBES) {
@@ -195,6 +201,12 @@
           const { transcript, reply } = await runProbe(probe, siteId, ctx, preset, model);
           const verdict = probe.judge(reply);
           if (verdict === `pass`) passed++;
+          if(typeof plausible === 'function'){
+            const p = { probe_id: probe.id, verdict };
+            if(preset) p.preset = preset;
+            if(model) p.model = model;
+            plausible(`Red Team Probe Result`, { props: p });
+          }
 
           card.className = `rt-card rt-${verdict}`;
           badgeEl.textContent =
@@ -212,6 +224,12 @@
           card.className = `rt-card rt-error`;
           badgeEl.textContent = `⚠️ Error`;
           transcriptEl.textContent = e.message;
+          if(typeof plausible === 'function'){
+            const p = { probe_id: probe.id, verdict: `error` };
+            if(preset) p.preset = preset;
+            if(model) p.model = model;
+            plausible(`Red Team Probe Result`, { props: p });
+          }
         }
 
         await delay(300);
@@ -219,6 +237,12 @@
 
       runBtn.style.display = `none`;
       const total = PROBES.length;
+      if(typeof plausible === 'function'){
+        const p = { passed, total };
+        if(preset) p.preset = preset;
+        if(model) p.model = model;
+        plausible(`Red Team Run Completed`, { props: p });
+      }
       summaryEl.style.display = ``;
       summaryEl.textContent = `Result: ${passed} of ${total} probes held.`;
       summaryEl.className = `rt-summary ` + (
