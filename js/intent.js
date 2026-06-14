@@ -11,7 +11,8 @@ window.BotIntent = (function () {
       slug: `emergency`,
       label: `Emergency`,
       re: /\b(emergency|flooding|flood|burst pipe|no power|power outage|sparks|electrical fire|urgent|asap)\b/i,
-      fulfillRe: /\b(dispatch(ing)?|on (the|my) way|eta|sending (a |someone|a technician)|heading over|en route|technician will)\b/i,
+      // Explicit dispatch language OR urgency-scheduling language (bot acknowledging emergency via appointment)
+      fulfillRe: /\b(dispatch(ing)?|on (the|my) way|eta|sending (a |someone|a technician)|heading over|en route|technician will|prioritize|expedite|emergency (service|scheduling|appointment)|earliest available|rush)\b/i,
       solicitRe: null,
     },
     {
@@ -81,9 +82,11 @@ window.BotIntent = (function () {
     }
   }
 
-  // Called after each bot reply. Two jobs:
+  // Called after each bot reply. Three jobs:
   //   1. Advance 'fired' → 'bot_offered' when the reply contains a fulfillment signal
   //   2. Add 'bot_solicited' when the bot asks if the user wants something not yet expressed
+  //   3. Cascade: if appointment/inspection reaches bot_offered and emergency is still fired,
+  //      advance emergency too (scheduling an urgent job = emergency resolved via appointment)
   function trackReply(botReply, pending) {
     if (!pending) return;
     for (const intent of INTENTS) {
@@ -95,6 +98,17 @@ window.BotIntent = (function () {
       } else if (state === undefined && intent.solicitRe && intent.solicitRe.test(botReply)) {
         pending.set(intent.slug, `bot_solicited`);
         console.log(`[BotIntent] bot_solicited`, intent.slug);
+      }
+    }
+
+    // Option B cascade: scheduling fulfillment implies emergency fulfillment
+    if (pending.get(`emergency`) === `fired`) {
+      const schedulingFulfilled = [`appointment`, `inspection`].some(
+        slug => pending.get(slug) === `bot_offered`
+      );
+      if (schedulingFulfilled) {
+        pending.set(`emergency`, `bot_offered`);
+        console.log(`[BotIntent] bot_offered emergency (cascade)`);
       }
     }
   }
