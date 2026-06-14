@@ -1,17 +1,20 @@
 window.BotIntent = (function () {
   const AFFIRMATION_RE = /\b(thanks|thank you|great|sounds good|perfect|appreciate|confirmed|got it|see you then|that works|will do|yes|yep|awesome|excellent|booked|done)\b/i;
 
+  // Matches explicit bot redirect-to-phone or inability-to-fulfill language
+  const DEFLECTION_RE = /\b(not able to (schedule|book|dispatch)|can'?t (schedule|book|dispatch)|unable to (schedule|book)|please call|give us a call|call us|call now|call (our|the) (team|office|number|line)|contact us (directly|to schedule|to book)|reach out (to us )?by phone)\b/i;
+
   // State machine per intent slug (stored in pendingConversions Map):
   //   'fired'         → user expressed intent; waiting for bot fulfillment signal
   //   'bot_solicited' → bot asked if user wants this (no prior user signal); waiting for affirmation
   //   'bot_offered'   → bot gave fulfillment/confirmation; waiting for user affirmation
-  //   'converted'     → Chat Conversion fired; done
+  //   'bot_deflected' → bot explicitly redirected to phone/other channel; Chat Deflection fired
+  //   'converted'     → user affirmed a bot_offered intent; Chat Conversion fired
   const INTENTS = [
     {
       slug: `emergency`,
       label: `Emergency`,
       re: /\b(emergency|flooding|flood|burst pipe|no power|power outage|sparks|electrical fire|urgent|asap)\b/i,
-      // Explicit dispatch language OR urgency-scheduling language (bot acknowledging emergency via appointment)
       fulfillRe: /\b(dispatch(ing)?|on (the|my) way|eta|sending (a |someone|a technician)|heading over|en route|technician will|prioritize|expedite|emergency (service|scheduling|appointment)|earliest available|rush)\b/i,
       solicitRe: null,
     },
@@ -48,14 +51,12 @@ window.BotIntent = (function () {
           if (!intent) continue;
 
           if (state === `bot_offered`) {
-            // Two-signal gate complete: bot offered + user affirmed → conversion
             pending.set(slug, `converted`);
             console.log(`[BotIntent] conversion`, bizLabel, `→`, intent.label);
             if (typeof plausible === `function`) {
               plausible(`Chat Conversion`, { props: { biz: bizLabel, intent: intent.label } });
             }
           } else if (state === `bot_solicited`) {
-            // Bot solicited + user affirmed → fire secondary Chat Intent, enter normal flow
             fired.add(slug);
             pending.set(slug, `fired`);
             console.log(`[BotIntent] secondary intent`, bizLabel, `→`, intent.label);
@@ -67,7 +68,6 @@ window.BotIntent = (function () {
       }
     }
 
-    // Detect new intents from user text
     for (const intent of INTENTS) {
       if (!intent.re.test(text)) continue;
       if (fired.has(intent.slug)) continue;
@@ -82,13 +82,14 @@ window.BotIntent = (function () {
     }
   }
 
-  // Called after each bot reply. Three jobs:
-  //   1. Advance 'fired' → 'bot_offered' when the reply contains a fulfillment signal
-  //   2. Add 'bot_solicited' when the bot asks if the user wants something not yet expressed
-  //   3. Cascade: if appointment/inspection reaches bot_offered and emergency is still fired,
-  //      advance emergency too (scheduling an urgent job = emergency resolved via appointment)
-  function trackReply(botReply, pending) {
+  // Called after each bot reply. Jobs:
+  //   1. Advance 'fired' → 'bot_offered' via fulfillRe
+  //   2. Add 'bot_solicited' via solicitRe for intents not yet in pending
+  //   3. Cascade: appointment/inspection bot_offered → emergency bot_offered
+  //   4. Deflection: bot redirect-to-phone → fire Chat Deflection for remaining 'fired' intents
+  function trackReply(botReply, pending, bizLabel) {
     if (!pending) return;
+
     for (const intent of INTENTS) {
       const state = pending.get(intent.slug);
 
@@ -101,7 +102,7 @@ window.BotIntent = (function () {
       }
     }
 
-    // Option B cascade: scheduling fulfillment implies emergency fulfillment
+    // Cascade: scheduling fulfillment implies emergency fulfillment
     if (pending.get(`emergency`) === `fired`) {
       const schedulingFulfilled = [`appointment`, `inspection`].some(
         slug => pending.get(slug) === `bot_offered`
@@ -109,6 +110,20 @@ window.BotIntent = (function () {
       if (schedulingFulfilled) {
         pending.set(`emergency`, `bot_offered`);
         console.log(`[BotIntent] bot_offered emergency (cascade)`);
+      }
+    }
+
+    // Deflection: bot explicitly redirected — mark remaining fired intents as deflected
+    if (DEFLECTION_RE.test(botReply)) {
+      for (const [slug, state] of pending) {
+        if (state !== `fired`) continue;
+        const intent = INTENTS.find(i => i.slug === slug);
+        if (!intent) continue;
+        pending.set(slug, `bot_deflected`);
+        console.log(`[BotIntent] bot_deflected`, slug);
+        if (bizLabel && typeof plausible === `function`) {
+          plausible(`Chat Deflection`, { props: { biz: bizLabel, intent: intent.label } });
+        }
       }
     }
   }

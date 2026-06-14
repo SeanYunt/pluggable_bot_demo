@@ -59,7 +59,7 @@
         const data = await res.json();
         if(data.error) throw new Error(data.error);
         history.push({role:'assistant', content: data.reply});
-        if(window.BotIntent) window.BotIntent.trackReply(data.reply, pendingConversions);
+        if(window.BotIntent) window.BotIntent.trackReply(data.reply, pendingConversions, "Sparky's Electrical Services");
         thinking.className = 'msg bot';
         thinking.textContent = data.reply;
         if(data.usage){
