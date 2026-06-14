@@ -1,6 +1,6 @@
 // Pluggable bot loader with tab-based business switching
 // Bump this on every deploy to bust CDN/browser cache for dynamic scripts
-const DEPLOY_V = '20260613a';
+const DEPLOY_V = '20260614a';
 (function(){
   const root        = document.getElementById('chat-root');
   const openBtn     = document.getElementById('openChat');

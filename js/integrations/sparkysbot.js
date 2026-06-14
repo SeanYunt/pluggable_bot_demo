@@ -17,11 +17,13 @@
 
     const history = [];
     const firedIntents = new Set();
+    const pendingConversions = new Map();
 
     resetLink.addEventListener('click', e => {
       e.preventDefault();
       history.length = 0;
       firedIntents.clear();
+      pendingConversions.clear();
       modelLabel.textContent = '';
       tokenLabel.textContent = '';
       resetLink.classList.add('hidden');
@@ -35,7 +37,7 @@
     async function handleSend(){
       const text = input.value.trim();
       if(!text) return;
-      if(window.BotIntent) window.BotIntent.track("Sparky's Electrical Services", text, firedIntents);
+      if(window.BotIntent) window.BotIntent.track("Sparky's Electrical Services", text, firedIntents, pendingConversions);
       appendMsg(body, 'user', text);
       input.value = '';
       send.disabled = true;
@@ -57,6 +59,7 @@
         const data = await res.json();
         if(data.error) throw new Error(data.error);
         history.push({role:'assistant', content: data.reply});
+        if(window.BotIntent) window.BotIntent.trackReply(data.reply, pendingConversions);
         thinking.className = 'msg bot';
         thinking.textContent = data.reply;
         if(data.usage){
