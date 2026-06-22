@@ -150,7 +150,7 @@
     sendBtn.addEventListener('click', handleSend);
     chatInput.addEventListener('keydown', e => { if(e.key === 'Enter') handleSend(); });
 
-    applyPreset('standard', true);
+    applyPreset('loose', true);
     chatInput.focus();
 
     function buildHTML(){
